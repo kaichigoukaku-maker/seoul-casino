@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEOUL NIGHT CASINO</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:"Hiragino Sans",sans-serif;background:radial-gradient(circle at 50% 0,#3a0b14,#0b0205 70%);color:#f5e6c8;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #8a6a2a;background:#0008}
+h1{margin:0;font-size:20px;letter-spacing:3px;color:#e8c36a}h1 small{font-size:11px;color:#b9a27a;letter-spacing:1px}
+#bank{font-size:18px;color:#ffd97a}#bank b{font-size:22px}
+main{max-width:900px;margin:auto;padding:18px}
+.lobby{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.tile{background:linear-gradient(160deg,#145a32,#0a2e1a);border:2px solid #c9a24a;border-radius:16px;padding:22px;cursor:pointer;transition:.2s}
+.tile:hover{transform:translateY(-4px);box-shadow:0 8px 30px #c9a24a55}.tile h2{margin:0 0 6px;color:#ffe19a}.tile p{margin:0;font-size:13px;color:#d8cfb5}
+.table{background:radial-gradient(ellipse at center,#1d7a45,#0b3b20);border:8px solid #5a3a14;border-radius:120px/60px;padding:26px 30px;min-height:380px;box-shadow:inset 0 0 40px #000a}
+.dealer-say{margin-right:190px;background:#000a;border-left:3px solid #e8c36a;padding:8px 12px;border-radius:6px;margin-bottom:12px;font-size:14px;min-height:38px}
+.dealer-say .ko{color:#ffd97a;font-weight:bold;margin-right:6px}
+.row{margin:10px 0}.lbl{font-size:12px;color:#cfe;opacity:.8}
+.cards{display:flex;gap:6px;flex-wrap:wrap;min-height:86px}
+.card{width:58px;height:84px;background:#fff;color:#111;border-radius:7px;display:flex;flex-direction:column;justify-content:space-between;padding:5px;font-weight:bold;font-size:17px;box-shadow:0 3px 8px #0009;position:relative;will-change:transform}.card .br{position:absolute;right:5px;bottom:4px;transform:rotate(180deg);font-size:13px}.card.squeeze{animation:sq 0.84s ease-in-out}@keyframes sq{0%{transform:none}40%{transform:perspective(300px) rotateX(18deg) translateY(-4px)}70%{transform:perspective(300px) rotateX(28deg) translateY(-6px)}100%{transform:none}}
+.card.red{color:#c0142a}.card .c{text-align:center;font-size:26px}.card.back{background:repeating-linear-gradient(45deg,#7a0f22,#7a0f22 6px,#a8203a 6px,#a8203a 12px);border:3px solid #fff}
+.table{position:relative}.shoe,.discard{position:absolute;top:18px;width:62px;height:88px;border-radius:8px;font-size:10px;color:#fff9;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;letter-spacing:1px}
+.shoe{right:28px;background:repeating-linear-gradient(45deg,#7a0f22,#7a0f22 6px,#a8203a 6px,#a8203a 12px);border:3px solid #fff;box-shadow:4px 4px 0 #3a2410,8px 8px 0 #2a180a}.discard{left:auto;right:110px;border:2px dashed #fff4}
+.die.shake{transition:transform .06s}.die.land{animation:land .35s}@keyframes land{0%{transform:scale(1.25)}60%{transform:scale(.92)}100%{transform:scale(1)}}
+.bac{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:40px}.side{border-radius:12px;padding:10px;min-height:120px}.side.p{background:#1a3d8a55;border:2px solid #4a7ae0}.side.b{background:#8a1a2a55;border:2px solid #e04a5a}.side .lbl b{font-size:20px;color:#fff;margin-left:6px}
+.spots{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}.spot{border:2px solid #fff5;border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;font-size:12px;font-weight:bold;min-height:70px}.spot small{display:block;color:#ffe19a}.spot b{display:block;color:#fff;font-size:13px;margin-top:3px}
+.spot.sel{border-color:#ffd97a;box-shadow:0 0 12px #ffd97a}.sP{background:#1a3d8a88}.sB{background:#8a1a2a88}.sT{background:#1d6a3a}.sPP{background:#1a3d8a44}.sBP{background:#8a1a2a44}
+.road{display:flex;flex-wrap:wrap;gap:3px;min-height:26px;background:#fff1;padding:6px;border-radius:8px;margin-top:4px}.bead{width:20px;height:20px;border-radius:50%;font-size:11px;line-height:20px;text-align:center;color:#fff;font-weight:bold}.bead.P{background:#2456c9}.bead.B{background:#c9242f}.bead.T{background:#1d8a3a}
+.dice{display:flex;gap:10px;min-height:64px}.die{width:58px;height:58px;background:#fafafa;color:#111;border-radius:10px;font-size:44px;line-height:58px;text-align:center;box-shadow:0 3px 8px #000a}.die.one{color:#c0142a}
+.roll{animation:spin .5s}@keyframes spin{0%{transform:rotate(0) scale(.6)}100%{transform:rotate(360deg)}}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+button{background:linear-gradient(#e8c36a,#b18a2e);border:none;color:#2a1a00;font-weight:bold;padding:10px 16px;border-radius:24px;cursor:pointer;font-size:14px}
+button:disabled{opacity:.35;cursor:default}button.sec{background:#0007;color:#f5e6c8;border:1px solid #c9a24a}
+.chip{width:52px;height:52px;border-radius:50%;padding:0;font-size:11px;border:4px dashed #fff;color:#fff}
+.k5{background:#c9242f}.k10{background:#2456c9}.k50{background:#e08a1e}.k100{background:#1d8a3a}.k500{background:#6a2bb0}.k1000{background:#222;border-color:#e8c36a}
+.yen{font-size:12px;color:#b9a27a;margin-left:6px}.setup{background:#0008;border:1px solid #c9a24a;border-radius:12px;padding:16px;margin-bottom:16px}.setup input{width:120px;padding:7px;border-radius:6px;border:1px solid #c9a24a;background:#111;color:#ffe19a;font-size:15px}.setup label{margin-right:14px;font-size:14px}
+#bet{font-size:16px;color:#ffe19a;min-width:130px}
+.res{font-size:22px;font-weight:bold;text-align:center;min-height:32px;margin-top:10px;color:#fff3c4;text-shadow:0 0 10px #e8c36a}
+.tip{font-size:12px;color:#b9a27a;margin-top:16px;line-height:1.7;background:#0006;padding:10px 14px;border-radius:8px}
+.back{margin-bottom:12px}
+.bead.K{background:#111;border:1px solid #fff6}
+.wheelbox{position:relative;width:240px;height:250px}.ptr{position:absolute;left:50%;top:-6px;transform:translateX(-50%);color:#ffd97a;font-size:22px;z-index:3;text-shadow:0 2px 4px #000}
+.rwheel{position:absolute;top:8px;left:0;width:240px;height:240px;border-radius:50%;box-shadow:0 6px 20px #000c}.rball{position:absolute;top:8px;left:0;width:240px;height:240px;pointer-events:none;z-index:2}
+.rball i{position:absolute;left:50%;top:22px;width:11px;height:11px;margin-left:-5.5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#bbb);box-shadow:0 1px 3px #000}.rball.spin i{top:6px}
+.bignum{margin-top:10px;font-size:34px;font-weight:bold;color:#ffe19a}.bn{display:inline-block;min-width:60px;text-align:center;border-radius:10px;padding:4px 10px;color:#fff}.bn.r{background:#c0142a}.bn.b{background:#111}.bn.g{background:#1d8a3a}
+.rlay{display:grid;grid-template-columns:repeat(14,1fr);grid-template-rows:repeat(5,38px);gap:2px;margin-top:12px;max-width:760px}.rc{position:relative;border:1px solid #fff6;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;cursor:pointer;border-radius:3px}
+.rc.r{background:#c0142a}.rc.b{background:#111}.rc.g{background:#1d8a3a}.rc.o{background:#0b3b2088;font-size:11px}.rc.o.r{background:#c0142a}.rc.o.b{background:#111}.rc.sel{outline:3px solid #ffd97a;z-index:1}.rc.win,.bws.win,.bws.win small{background:#e8c36a!important;color:#2a1a00!important}
+.chp{position:absolute;right:1px;bottom:1px;font-style:normal;font-size:9px;background:#fff;color:#c0142a;border-radius:8px;padding:0 3px;border:1px dashed #c0142a}
+.bwlay{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}.bws{position:relative;border-radius:10px;padding:10px 4px;text-align:center;font-weight:bold;cursor:pointer;border:2px solid #fff5;min-height:60px}.bws small{display:block;font-size:11px;opacity:.85}.bws.sel{outline:3px solid #ffd97a}
+
+.rules{font-size:12px;background:#0006;padding:8px 12px;border-radius:8px;margin:0 190px 8px 0;line-height:1.8}.rules label{margin-right:14px;cursor:pointer}
+.hands{display:flex;gap:14px;flex-wrap:wrap}.hand{padding:6px;border-radius:10px;border:2px solid transparent}.hand.cur{border-color:#ffd97a;box-shadow:0 0 12px #ffd97a88}.hb{color:#ffe19a}
+.shoe.shuffling{animation:shf .25s infinite alternate}@keyframes shf{from{transform:translateX(-6px) rotate(-4deg)}to{transform:translateX(6px) rotate(4deg)}}
+.dome{width:230px;height:110px;border-radius:50% 50% 14px 14px;background:radial-gradient(circle at 40% 30%,#fff3,#fff1 60%,#0002);border:2px solid #fff5;display:flex;align-items:center;justify-content:center}.dome.shaking{animation:shf .09s infinite alternate}
+.sbgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:5px;margin-top:12px}.sbs{border:1px solid #fff5;border-radius:8px;padding:5px 3px;text-align:center;cursor:pointer;font-size:13px;font-weight:bold;background:#0003;min-height:54px}
+.sbs small{display:block;font-size:9px;color:#cfe;font-weight:normal}.sbs small.o{color:#ffe19a;font-size:10px}.sbs b{display:block;font-size:11px;color:#fff}.sbs.sel{border-color:#ffd97a;box-shadow:0 0 10px #ffd97a}.sbs.win{background:#e8c36a;color:#2a1a00}.sbs.win small{color:#2a1a00}
+.k_small,.k_big{grid-column:span 2;background:#8a1a2a88;font-size:16px}.k_odd,.k_even{grid-column:span 2;background:#1a3d8a66}
+.seats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-right:0}.seat{background:#0006;border:2px solid #fff3;border-radius:10px;padding:6px 8px;min-height:120px;transition:.3s}.seat.me{border-color:#4a7ae0;background:#1a3d8a55}
+.seat.turn{border-color:#ffd97a;box-shadow:0 0 14px #ffd97a}.seat.fold{opacity:.5}.seat .nm{font-weight:bold;font-size:13px}.seat .st{color:#ffe19a;font-size:13px}.seat .ac{font-size:12px;min-height:18px;color:#fff}.seat .ac b{color:#ffe19a}.mk{font-size:10px;color:#cfe}.mk .btn{background:#fff;color:#111;border-radius:50%;padding:0 4px}
+.seat .cards{min-height:60px}.mini .card{width:40px;height:58px;font-size:12px;padding:3px}.mini .card .c{font-size:16px}.mini .card .br{display:none}.winx{color:#ffd97a;font-weight:bold}
+
+</style></head><body>
+<header><h1>SEOUL NIGHT CASINO <small>카지노 · 練習用（架空チップ）</small></h1><div id="bank">₩<b id="money">0</b><span class="yen" id="yen"></span></div></header>
+<main id="app"></main>
+<script>
+const $=s=>document.querySelector(s);let bet=0;
+let money=840000;try{money=+(localStorage.casinoMoney||840000)}catch(e){}
+const fmt=n=>n.toLocaleString();
+let rate=8.4,startYen=100000;try{rate=+(localStorage.casinoRate||8.4);startYen=+(localStorage.casinoStart||100000)}catch(e){}
+const yen=w=>'≈¥'+fmt(Math.round(w/rate));
+const exchange=y=>Math.floor(y*rate/5000)*5000; // キャッシャーは最小チップ単位で両替
+function setMoney(v){money=v;try{localStorage.casinoMoney=v}catch(e){}$('#money').textContent=fmt(v);$('#yen').textContent=yen(v)+'（持参 ¥'+fmt(startYen)+' / 収支 '+(v-exchange(startYen)>=0?'+':'−')+'¥'+fmt(Math.abs(Math.round((v-exchange(startYen))/rate)))+'）'}
+function applySetup(){const y=Math.max(10000,+$('#syen').value||0),r=+$('#srate').value||8.4;startYen=y;rate=r;try{localStorage.casinoStart=y;localStorage.casinoRate=r}catch(e){}setMoney(exchange(y));lobby()}
+setMoney(money);
+const say=(ko,ja)=>$('#say').innerHTML=`<span class="ko">${ko}</span>${ja}`;
+const result=t=>$('#res').textContent=t.replace(/([+-])₩([\d,]+)/,(m,sg,n)=>m+'（'+sg+'¥'+fmt(Math.round(+n.replace(/,/g,'')/rate))+'）');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- Lobby ---------- */
+function lobby(){
+  $('#app').innerHTML=`
+  <div class="setup"><b style="color:#ffe19a">💴 キャッシャー（両替）</b><br><br>
+   <label>持っていく金額 ¥<input id="syen" type="number" step="10000" value="${startYen}"></label>
+   <label>レート 1円＝<input id="srate" type="number" step="0.01" value="${rate}" style="width:80px">ウォン</label>
+   <button onclick="applySetup()">この金額で両替して入場</button>
+   <div style="font-size:12px;color:#b9a27a;margin-top:8px">→ ¥${fmt(startYen)} は約 ₩${fmt(exchange(startYen))}。レートは2026年11月中旬の目安（約8.4）。現地の両替レートに書き換えてください。</div></div>
+  <p style="text-align:center;color:#d8cfb5">어서 오세요!（いらっしゃいませ）— テーブルを選んでください</p>
+  <div class="lobby">
+   <div class="tile" onclick="bj()"><h2>♠ ブラックジャック</h2><p>21に近づけてディーラーに勝つ。韓国カジノの定番。BJは1.5倍配当</p></div>
+   <div class="tile" onclick="chin()"><h2>🎲 チンチロ</h2><p>※日本の遊び（韓国カジノにはなし）。サイコロ3つで役勝負。シゴロ2倍・ゾロ目3倍・ピンゾロ5倍</p></div>
+   <div class="tile" onclick="bac()"><h2>♥ バカラ</h2><p>韓国カジノの主役。プレイヤーかバンカーか。絞り（スクイーズ）と出目表つき</p></div>
+   <div class="tile" onclick="poker()"><h2>♦ カジノホールデム</h2><p>ディーラー相手のホールデム（韓国カジノはこの形式が主流）。アンティ→コールかフォールド</p></div>
+   <div class="tile" onclick="texas()"><h2>♣ テキサスホールデム</h2><p>客同士で戦う普通のポーカー（AI 5人と6人卓・ノーリミット）。カジノは場代のみ</p></div>
+   <div class="tile" onclick="roulette()"><h2>⭕ ルーレット</h2><p>数字・赤黒・奇偶に張る定番。ホイールとボールが本物の速さで回る。シングル／ダブルゼロ切替</p></div>
+   <div class="tile" onclick="cstud()"><h2>♠ カリビアンスタッド</h2><p>5枚ポーカーでディーラーと勝負。交換なし・役が強いほど高配当（ロイヤル100倍）</p></div>
+   <div class="tile" onclick="tcp()"><h2>♥ スリーカードポーカー</h2><p>3枚だけの手早いポーカー。ペアプラスは自分の手だけで配当</p></div>
+   <div class="tile" onclick="bigwheel()"><h2>🎡 ビッグホイール</h2><p>大きな輪を回すだけ。最大40倍。一番かんたん（でもカジノ有利）</p></div>
+   <div class="tile" onclick="sicbo()"><h2>🎲 大小（タイサイ）</h2><p>韓国カジノの本物のサイコロゲーム。大・小・ゾロ目・合計などに張る</p></div>
+  </div>
+  <div class="tip">💡 本番メモ：韓国の外国人カジノ（パラダイス、セブンラック等）はパスポート必須。チップ交換は「キャッシャー」。ディーラーへのチップは任意。<br>
+  チップ：₩5,000（赤）／1万（青）／5万（橙）／10万（緑）／50万（紫）／100万（黒）を想定。色・最低ベットはカジノ・卓ごとに違うので現地で確認を。最低ベット目安：BJ・ホールデム ₩10,000〜、大小系 ₩5,000〜。</div>`;
+}
+let onLeave=null;
+function tableShell(title,body){BA.on=false;SB.on=false;MS.on=false;
+  $('#app').innerHTML=`<button class="sec back" onclick="if(!busy){if(onLeave)onLeave();onLeave=null;BA.on=SB.on=MS.on=false;lobby()}">← ロビーへ</button>
+  <div class="table"><div style="color:#ffe19a;font-weight:bold;margin-bottom:8px">${title}</div>
+  <div class="dealer-say" id="say"></div>${body}<div class="res" id="res"></div></div>`;
+}
+/* bet widget */
+
+function betHTML(){return `<div class="ctrl" id="betbox">
+ ${[[5000,'5千','k5'],[10000,'1万','k10'],[50000,'5万','k50'],[100000,'10万','k100'],[500000,'50万','k500'],[1000000,'100万','k1000']].map(([v,t,c])=>`<button class="chip ${c}" onclick="addBet(${v})">${t}</button>`).join('')}
+ <button class="sec" onclick="if(!busy){bet=0;if(BA.on){BA.bets={P:0,B:0,T:0,PP:0,BP:0};bacSpots()}if(SB.on){SB.bets={};sbRender()}if(MS.on){MS.bets={};MS.render()}showBet()}">クリア</button><span id="bet"></span></div>`}
+function addBet(v){if(busy)return;if(bet+v<=money){bet+=v;if(BA.on){BA.bets[BA.sel]+=v;bacSpots()}if(SB.on){SB.bets[SB.sel]=(SB.bets[SB.sel]||0)+v;sbRender()}if(MS.on){MS.bets[MS.sel]=(MS.bets[MS.sel]||0)+v;MS.render()}showBet()}else say('돈이 부족해요.','（チップが足りません）')}
+function showBet(){$('#bet').innerHTML='ベット ₩'+fmt(bet)+'<span class="yen">'+yen(bet)+'</span>'}
+let MINBET=10000;function minOk(){if(bet<MINBET){say('최소 베팅은 '+fmt(MINBET)+'원입니다.','（最低ベットは₩'+fmt(MINBET)+'です）');return false}return true}
+function lockBet(on){document.querySelectorAll('#betbox button').forEach(b=>b.disabled=on)}
+
+/* ---------- Cards（実際の配り方に近いアニメーション） ---------- */
+const SUITS=['♠','♥','♦','♣'],RANKS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const SPEED={fly:560,gap:420,flip:300,squeeze:1400};
+function deck(n=1){let d=[];for(let k=0;k<n;k++)for(const s of SUITS)for(let r=0;r<13;r++)d.push({s,r});for(let i=d.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[d[i],d[j]]=[d[j],d[i]]}return d}
+const isRed=c=>c.s=='♥'||c.s=='♦';
+const faceHTML=c=>`<span>${RANKS[c.r]}</span><span class="c">${c.s}</span><span class="br">${RANKS[c.r]}</span>`;
+const frame=()=>new Promise(r=>{let d=0;const f=()=>{if(!d){d=1;r()}};requestAnimationFrame(()=>requestAnimationFrame(f));setTimeout(f,40)});
+let busy=false;
+async function dealCard(id,c,up=true,opt={}){
+  const box=$(id),el=document.createElement('div');el.className='card back';el._c=c;box.appendChild(el);
+  const shoe=$('#shoe').getBoundingClientRect(),r=el.getBoundingClientRect();
+  el.style.transition='none';el.style.transform=`translate(${shoe.left-r.left}px,${shoe.top-r.top}px) rotate(${-30+Math.random()*10}deg)`;
+  await frame();
+  const fly=opt.fast?380:SPEED.fly;el.style.transition=`transform ${fly}ms cubic-bezier(.15,.75,.3,1)`;el.style.transform=`rotate(${(Math.random()-.5)*4}deg)`;
+  await sleep(fly);
+  if(up)await flip(el,opt.slow);
+  await sleep(opt.nogap?0:opt.fast?120:SPEED.gap-200);
+  return el}
+async function flip(el,slow){
+  if(!el||!el.classList.contains('back'))return;const c=el._c,t=slow?SPEED.squeeze:SPEED.flip,base=el.style.transform||'';
+  if(slow){el.classList.add('squeeze');await sleep(t*0.6)}
+  el.style.transition=`transform ${t*0.2}ms ease-in`;el.style.transform=base+' scaleX(0.02)';await sleep(t*0.2);
+  el.className='card'+(isRed(c)?' red':'');el.innerHTML=faceHTML(c);
+  el.style.transition=`transform ${t*0.2}ms ease-out`;el.style.transform=base;await sleep(t*0.2)}
+const flipAt=(id,i,slow)=>flip($(id).children[i],slow);
+async function collect(ids){
+  const cards=ids.flatMap(id=>[...$(id).children]);if(!cards.length)return;
+  const dis=$('#discard').getBoundingClientRect();
+  cards.forEach((el,i)=>{const r=el.getBoundingClientRect();el.style.transition=`transform .55s ease-in ${i*40}ms, opacity .55s ease-in ${i*40}ms`;el.style.transform=`translate(${dis.left-r.left}px,${dis.top-r.top}px) rotate(20deg) scale(.8)`;el.style.opacity='0'});
+  await sleep(600+cards.length*40);ids.forEach(id=>$(id).innerHTML='')}
+const shoeHTML='<div class="shoe" id="shoe">SHOE</div><div class="discard" id="discard">DISCARD</div>';
+function setBtns(map){for(const[k,v]of Object.entries(map)){const e=$('#'+k);if(e)e.disabled=!v}}
+
+/* ---------- Shoe（カットカード・シャッフル） ---------- */
+function makeShoe(decks,leave){return{cards:deck(decks),cut:leave,decks}}
+const shoeNeed=s=>!s||s.cards.length<=s.cut;
+async function shuffleAnim(ko,ja){say(ko,ja);const e=$('#shoe');if(e){e.classList.add('shuffling');await sleep(1600);e.classList.remove('shuffling')}else await sleep(800)}
+
+/* ---------- Blackjack ---------- */
+let B={hid:0},BJR={h17:false,sur:false};try{Object.assign(BJR,JSON.parse(localStorage.bjr||'{}'))}catch(e){}
+function saveBJR(){try{localStorage.bjr=JSON.stringify(BJR)}catch(e){}}
+function bj(){
+  MINBET=10000;tableShell('BLACKJACK — 블랙잭 · 最低₩10,000',shoeHTML+`
+  <div class="rules">卓のルール：6デッキ／BJ 3:2／インシュランス 2:1／スプリット最大4ハンド（Aは各1枚・再スプリット不可）／スプリット後ダブル可<br>
+   <label><input type="checkbox" ${BJR.h17?'checked':''} onchange="BJR.h17=this.checked;saveBJR()"> ディーラーはソフト17でヒット（H17）</label>
+   <label><input type="checkbox" ${BJR.sur?'checked':''} onchange="BJR.sur=this.checked;saveBJR()"> レイトサレンダーあり</label></div>
+  <div class="row"><div class="lbl">ディーラー <span id="dv"></span></div><div class="cards" id="dh"></div></div>
+  <div class="row"><div class="lbl">あなた</div><div class="hands" id="ph"></div></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="deal" onclick="bjDeal()">ディール</button>
+  <button id="hit" onclick="bjHit()" disabled>ヒット</button><button id="stand" onclick="bjStand()" disabled>スタンド</button>
+  <button id="dbl" onclick="bjDouble()" disabled>ダブル</button><button id="spl" onclick="bjSplit()" disabled>スプリット</button>
+  <button id="sur" class="sec" onclick="bjSurrender()" disabled>サレンダー</button>
+  <button id="insY" onclick="bjIns(true)" disabled>インシュランス</button><button id="insN" class="sec" onclick="bjIns(false)" disabled>しない</button></div>
+  <div class="tip">配り順は本物と同じ：あなた→ディーラー(表)→あなた→ディーラー(伏せ)。ディーラーの表がA・10のときはBJかどうか先に確認（ピーク）します。シューの残りが約1/4になるとカットカードが出てシャッフル。<br>手振り：ヒット＝テーブルを指でトントン／スタンド＝手のひらを横に振る／ダブル・スプリット＝チップを横に追加で置く（本番は口頭より手振りが基本）</div>`);
+  bet=0;showBet();say('베팅해 주세요.','（ベットをどうぞ）');
+}
+const cv=c=>c.r==12?11:c.r>=8?10:c.r+2;
+function bjCalc(h){let v=0,a=0;for(const c of h){v+=cv(c);if(c.r==12)a++}while(v>21&&a){v-=10;a--}return{v,soft:a>0}}
+const bjVal=h=>bjCalc(h).v;
+const isBJ=H=>!H.split&&H.cards.length==2&&bjVal(H.cards)==21;
+function bjDraw(){return B.shoe.cards.pop()}
+const BJB=['deal','hit','stand','dbl','spl','sur','insY','insN'];
+function bjBtns(on){BJB.forEach(k=>{const e=$('#'+k);if(e)e.disabled=!on[k]})}
+function newHand(b){const H={id:B.hid++,cards:[],bet:b};const d=document.createElement('div');d.className='hand';d.id='hand'+H.id;d.innerHTML=`<div class="lbl"><span id="hv${H.id}"></span> <span class="hb" id="hb${H.id}">₩${fmt(b)}</span></div><div class="cards" id="hc${H.id}"></div>`;H.el=d;return H}
+function hvUpd(H){const{v,soft}=bjCalc(H.cards);$('#hv'+H.id).textContent=H.cards.length?(soft&&v<21?`(${v-10}/${v})`:`(${v})`)+(v>21?' バースト':''):'';$('#hb'+H.id).textContent='₩'+fmt(H.bet)}
+function markCur(){B.hands.forEach((H,i)=>H.el.classList.toggle('cur',i==B.cur&&B.hands.length>1))}
+function bjScore(hide){$('#dv').textContent=!B.dh.length?'':hide?'('+cv(B.dh[0])+')':'('+bjVal(B.dh)+')'}
+async function bjHit1(H,opt){const c=bjDraw();H.cards.push(c);const el=await dealCard('#hc'+H.id,c,true,opt);hvUpd(H);return el}
+async function bjDeal(){if(busy)return;if(!bet)return say('베팅해 주세요.','（まずチップを置いてください）');if(!minOk())return;
+  busy=true;bjBtns({});lockBet(true);result('');
+  await collect(['#dh',...[...document.querySelectorAll('#ph .cards')].map(e=>'#'+e.id)]);$('#ph').innerHTML='';$('#dv').textContent='';
+  if(shoeNeed(B.shoe)){await shuffleAnim('셔플하겠습니다.','（カットカードが出たのでシャッフルします）');B.shoe=makeShoe(6,78);B.shoe.cards.pop();say('번 카드.','（1枚目は捨て札＝バーン）');await sleep(700)}
+  setMoney(money-bet);const H=newHand(bet);$('#ph').appendChild(H.el);B.hands=[H];B.cur=0;B.ins=0;B.dh=[];
+  say('카드 드릴게요.','（カードを配ります）');
+  await bjHit1(H);B.dh.push(bjDraw());await dealCard('#dh',B.dh[0]);bjScore(true);
+  await bjHit1(H);B.dh.push(bjDraw());await dealCard('#dh',B.dh[1],false);
+  if(B.dh[0].r==12&&!isBJ(H)&&money>=H.bet/2){busy=false;bjBtns({insY:1,insN:1});return say('인슈어런스 하시겠어요?','（インシュランスしますか？ ベットの半額で、ディーラーBJなら2倍返し）')}
+  if(B.dh[0].r==12&&isBJ(H)){say('이븐 머니.','（BJ同士の可能性。このゲームでは通常どおり続行します）');await sleep(800)}
+  await bjPeek()}
+async function bjIns(yes){if(busy)return;busy=true;bjBtns({});if(yes){B.ins=B.hands[0].bet/2;setMoney(money-B.ins);say('인슈어런스 받았습니다.','（インシュランスを受けました）');await sleep(600)}await bjPeek()}
+async function bjPeek(){const up=B.dh[0];
+  if(cv(up)>=10){say('딜러 블랙잭 확인합니다.','（ディーラーがBJか確認します）');const el=$('#dh').children[1];const t=el.style.transform;el.style.transition='transform .35s';el.style.transform=t+' translateY(-6px) rotate(-6deg)';await sleep(900);el.style.transform=t;await sleep(400)}
+  if(bjVal(B.dh)==21){await flipAt('#dh',1);bjScore(false);say('딜러 블랙잭입니다.','（ディーラーのブラックジャックです）');await sleep(700);return bjSettle()}
+  if(cv(up)>=10){say('블랙잭 아닙니다.','（ブラックジャックではありません）'+(B.ins?'インシュランスは没収です。':''));await sleep(700)}
+  if(isBJ(B.hands[0])){await flipAt('#dh',1);bjScore(false);return bjSettle()}
+  busy=false;bjTurn()}
+function bjTurn(){const H=B.hands[B.cur];markCur();
+  if(H.done||bjVal(H.cards)>=21){H.done=true;return bjNext()}
+  const two=H.cards.length==2;
+  bjBtns({hit:1,stand:1,dbl:two&&money>=H.bet,spl:two&&cv(H.cards[0])==cv(H.cards[1])&&B.hands.length<4&&!H.aces&&money>=H.bet,sur:BJR.sur&&two&&B.hands.length==1});
+  say('카드 더 받으시겠어요?',B.hands.length>1?`（${B.cur+1}番目のハンドです）`:'（どうしますか？）')}
+async function bjHit(){if(busy)return;busy=true;bjBtns({});const H=B.hands[B.cur];await bjHit1(H);busy=false;
+  if(bjVal(H.cards)>21){say('버스트!','（バーストです）');await sleep(600)}bjTurn()}
+function bjStand(){if(busy)return;B.hands[B.cur].done=true;bjNext()}
+async function bjDouble(){if(busy)return;busy=true;bjBtns({});const H=B.hands[B.cur];setMoney(money-H.bet);H.bet*=2;H.dbl=true;hvUpd(H);say('더블 다운.','（ダブルダウン。1枚だけです）');
+  const el=await bjHit1(H);el.style.transform+=' rotate(90deg)';H.done=true;busy=false;bjNext()}
+async function bjSurrender(){if(busy)return;const H=B.hands[0];H.sur=true;H.done=true;say('서렌더.','（サレンダー：ベットの半分が戻ります）');bjNext()}
+async function bjSplit(){if(busy)return;busy=true;bjBtns({});const H=B.hands[B.cur];setMoney(money-H.bet);
+  const nh=newHand(H.bet);const c=H.cards.pop();nh.cards=[c];H.split=nh.split=true;if(c.r==12)H.aces=nh.aces=true;
+  B.hands.splice(B.cur+1,0,nh);H.el.after(nh.el);const ce=$('#hc'+H.id).lastElementChild;
+  say('스플릿.','（スプリット：2つのハンドに分けます）');ce.style.transition='transform .4s';ce.style.transform='translateX(40px)';await sleep(400);ce.style.transform='';$('#hc'+nh.id).appendChild(ce);hvUpd(H);hvUpd(nh);await sleep(300);
+  await bjHit1(H);if(H.aces){await bjHit1(nh);H.done=nh.done=true}busy=false;bjTurn()}
+async function bjNext(){busy=true;bjBtns({});B.cur++;
+  if(B.cur<B.hands.length){const H=B.hands[B.cur];markCur();if(H.cards.length==1){await sleep(300);await bjHit1(H);if(H.aces)H.done=true}busy=false;return bjTurn()}
+  B.cur=-1;markCur();await bjDealer()}
+async function bjDealer(){say('딜러 카드 오픈합니다.','（ディーラーのカードを開けます）');await sleep(500);await flipAt('#dh',1);bjScore(false);await sleep(500);
+  if(B.hands.some(H=>!H.sur&&bjVal(H.cards)<=21)){
+    for(;;){const{v,soft}=bjCalc(B.dh);if(v<17||(BJR.h17&&v==17&&soft)){await sleep(300);B.dh.push(bjDraw());await dealCard('#dh',B.dh.at(-1));bjScore(false)}else break}}
+  bjSettle()}
+function bjSettle(){
+  const d=bjVal(B.dh),dbj=B.dh.length==2&&d==21;let ret=0,staked=0;const lines=[];
+  if(B.ins){staked+=B.ins;if(dbj){ret+=B.ins*3;lines.push('インシュランス的中')}}
+  B.hands.forEach((H,i)=>{const p=bjVal(H.cards);let r=0,t;staked+=H.bet;
+    if(H.sur){r=H.bet/2;t='サレンダー'}
+    else if(p>21){t='バースト'}
+    else if(isBJ(H)&&!dbj){r=H.bet*2.5;t='ブラックジャック！'}
+    else if(dbj){r=isBJ(H)?H.bet:0;t=isBJ(H)?'BJ同士でプッシュ':'ディーラーBJ'}
+    else if(d>21||p>d){r=H.bet*2;t='勝ち'}
+    else if(p==d){r=H.bet;t='プッシュ'}
+    else t='負け';
+    ret+=r;lines.push((B.hands.length>1?`H${i+1}:`:'')+t)});
+  const net=ret-staked;setMoney(money+ret);
+  say(net>0?'축하합니다!':net==0?'푸시입니다.':'딜러 승입니다.',net>0?'（おめでとうございます！）':net==0?'（引き分けです）':'（ディーラーの勝ちです）');
+  result(lines.join(' / ')+`　${net>=0?'+':'-'}₩${fmt(Math.abs(net))}`);
+  busy=false;bjBtns({deal:1});lockBet(false);if(bet>money){bet=0;showBet()}}
+
+/* ---------- Chinchiro ---------- */
+const PIP=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+function chin(){
+  MINBET=5000;tableShell('CHINCHIRO — 주사위 · 最低₩5,000',`
+  <div class="row"><div class="lbl">親（ディーラー）<span id="dr"></span></div><div class="dice" id="dd"></div></div>
+  <div class="row"><div class="lbl">あなた <span id="pr"></span></div><div class="dice" id="pd"></div></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="cgo" onclick="chinStart()">勝負する</button><button id="croll" onclick="chinRoll()" disabled>振る</button></div>
+  <div class="tip">役：ピンゾロ(1-1-1)5倍／ゾロ目3倍／シゴロ(4-5-6)2倍／目(2つ揃い+残り1つの数字)1倍／ヒフミ(1-2-3)2倍払い／3回振って役なし＝目なし負け。親が先に振ります。<br>※チンチロは日本の遊び。韓国カジノでサイコロなら「大小（タイサイ）」が近いです。</div>`);
+  bet=0;showBet();say('베팅하세요.','（張ってください）');
+}
+function hand(d){const s=[...d].sort();const[a,b,c]=s;
+  if(a==b&&b==c)return a==1?{n:'ピンゾロ',v:100,m:5}:{n:a+'のゾロ目',v:50+a,m:3};
+  if(a==4&&b==5&&c==6)return{n:'シゴロ',v:40,m:2};
+  if(a==1&&b==2&&c==3)return{n:'ヒフミ',v:-10,m:-2};
+  if(a==b)return{n:c+'の目',v:c,m:1};if(b==c)return{n:a+'の目',v:a,m:1};if(a==c)return{n:b+'の目',v:b,m:1};
+  return null}
+const r3=()=>[1,2,3].map(()=>1+Math.random()*6|0);
+async function rollDice(id,d){const box=$(id);box.innerHTML=[0,1,2].map(()=>'<div class="die shake"></div>').join('');const ds=[...box.children];
+  const t0=Date.now(),dur=1300;while(Date.now()-t0<dur){const k=(Date.now()-t0)/dur;ds.forEach(e=>{const x=1+Math.random()*6|0;e.textContent=PIP[x];e.style.transform=`translate(${(Math.random()-.5)*30*(1-k)}px,${(Math.random()-.5)*20*(1-k)}px) rotate(${Math.random()*360*(1-k)}deg)`});await sleep(60+140*k)}
+  ds.forEach((e,i)=>{e.classList.remove('shake');e.textContent=PIP[d[i]];e.className='die land'+(d[i]==1?' one':'');e.style.transform=''});await sleep(450)}
+let C={};
+async function chinStart(){if(busy)return;if(bet&&!minOk())return;
+  if(!bet)return say('베팅하세요.','（まず張ってください）');
+  busy=true;setMoney(money-bet);C={bet,tries:0};lockBet(true);$('#cgo').disabled=true;result('');$('#pd').innerHTML='';$('#pr').textContent='';$('#dd').innerHTML='';$('#dr').textContent='';
+  say('딜러 먼저 굴립니다.','（親が先に振ります）');let h=null;
+  for(let i=0;i<3&&!h;i++){await sleep(500);const d=r3();await rollDice('#dd',d);h=hand(d);$('#dr').textContent=h?'【'+h.n+'】':`(${i+1}投目 役なし)`}
+  if(!h)h={n:'目なし',v:-5,m:-1};$('#dr').textContent='【'+h.n+'】';C.dh=h;busy=false;
+  if(h.m>=2||h.m<0){await sleep(600);return chinSettle(null)}
+  say('손님 차례입니다.','（お客様の番です）');$('#croll').disabled=false;
+}
+async function chinRoll(){if(busy)return;busy=true;$('#croll').disabled=true;C.tries++;const d=r3();await rollDice('#pd',d);const h=hand(d);busy=false;
+  if(h||C.tries>=3){C.ph=h||{n:'目なし',v:-5,m:-1};$('#pr').textContent='【'+C.ph.n+'】';chinSettle(C.ph)}
+  else{$('#pr').textContent=`(${C.tries}投目 役なし・あと${3-C.tries}回)`;$('#croll').disabled=false}}
+function chinSettle(p){const d=C.dh;let mult;
+  if(!p){mult=-d.m;
+    if(d.m<0){result(`親が${d.n}！ +₩${fmt(C.bet*-d.m)}`);say('손님 승!','（お客様の勝ち！）')}else{result(`親が${d.n}… -₩${fmt(C.bet*d.m)}`);say('딜러 승입니다.','（親の勝ちです）')}
+  }else if(p.v>d.v){mult=Math.max(p.m,1);result('勝ち！ +₩'+fmt(C.bet*mult));say('축하합니다!','（おめでとうございます）')}
+  else if(p.v<d.v){mult=-Math.max(p.m<0?-p.m:1,d.m);result('負け… -₩'+fmt(C.bet*-mult));say('딜러 승입니다.','（親の勝ちです）')}
+  else{mult=0;result('引き分け');say('비겼습니다.','（引き分けです）')}
+  // mult>0: 返却+mult倍, mult<0: 賭け金に加え(|mult|-1)倍を追加で失う
+  setMoney(Math.max(0,money+(mult>=0?C.bet*(1+mult):-C.bet*(-mult-1))));
+  lockBet(false);$('#cgo').disabled=false;if(bet>money){bet=0;showBet()}}
+
+/* ---------- Casino Hold'em ---------- */
+function eval5(cs){const r=cs.map(c=>c.r).sort((a,b)=>b-a),fl=cs.every(c=>c.s==cs[0].s);
+  let u=[...new Set(r)],st=-1;if(u.length==5){if(u[0]-u[4]==4)st=u[0];else if(u.join()=='12,3,2,1,0')st=3}
+  const cnt={};r.forEach(x=>cnt[x]=(cnt[x]||0)+1);const g=Object.entries(cnt).map(([k,v])=>[v,+k]).sort((a,b)=>b[0]-a[0]||b[1]-a[1]);const ks=g.map(x=>x[1]);
+  let cat;if(st>=0&&fl)cat=8;else if(g[0][0]==4)cat=7;else if(g[0][0]==3&&g[1][0]==2)cat=6;else if(fl)cat=5;else if(st>=0)cat=4;else if(g[0][0]==3)cat=3;else if(g[0][0]==2&&g[1][0]==2)cat=2;else if(g[0][0]==2)cat=1;else cat=0;
+  if(cat==8&&st==12)cat=9;
+  const key=st>=0&&(cat>=8||cat==4)?[st]:(cat==5||cat==0?r:ks);return [cat,...key]}
+function best(c7){let b=null;for(let i=0;i<7;i++)for(let j=i+1;j<7;j++){const h=c7.filter((_,k)=>k!=i&&k!=j),v=eval5(h);if(!b||cmp(v,b)>0)b=v}return b}
+function cmp(a,b){for(let i=0;i<Math.max(a.length,b.length);i++){if((a[i]??-1)!=(b[i]??-1))return (a[i]??-1)-(b[i]??-1)}return 0}
+const HN=['ハイカード','ワンペア','ツーペア','スリーカード','ストレート','フラッシュ','フルハウス','フォーカード','ストレートフラッシュ','ロイヤルフラッシュ'];
+const ANTE_PAY=[1,1,1,1,1,2,3,10,20,100];
+let P={};
+function poker(){
+  MINBET=10000;tableShell("CASINO HOLD'EM — 카지노 홀덤 · 最低₩10,000",shoeHTML+`
+  <div class="row"><div class="lbl">ディーラー <span id="pdl"></span></div><div class="cards" id="pdh"></div></div>
+  <div class="row"><div class="lbl">ボード</div><div class="cards" id="board"></div></div>
+  <div class="row"><div class="lbl">あなた <span id="ppl"></span></div><div class="cards" id="pph"></div></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="pdeal" onclick="pkDeal()">アンティを置いて配る</button>
+  <button id="pcall" onclick="pkCall()" disabled>コール（アンティ×2）</button><button id="pfold" class="sec" onclick="pkFold()" disabled>フォールド</button></div>
+  <div class="tip">流れ：アンティ→手札2枚＋フロップ3枚→コール(アンティの2倍)かフォールド→ターン・リバー公開→勝負。ディーラーは4のペア以上で参加資格。資格なし＝アンティだけ役に応じて払い戻し・コールは返却。アンティ配当：フラッシュ2倍／フルハウス3倍／フォーカード10倍／SF20倍／ロイヤル100倍。コールは1:1。トランプ1デッキを毎ハンドシャッフル（本物もシャッフルマシンで毎回）。</div>`);
+  bet=0;showBet();say('앤티 베팅하세요.','（アンティをどうぞ）');
+}
+async function pkDeal(){if(busy)return;if(bet&&!minOk())return;if(!bet)return say('앤티 베팅하세요.','（アンティを置いてください）');if(money<bet*3)return say('콜 금액이 부족해요.','（コール分のチップも必要です：アンティ×3）');
+  busy=true;lockBet(true);setBtns({pdeal:0,pcall:0,pfold:0});setMoney(money-bet);result('');$('#pdl').textContent='';$('#ppl').textContent='';
+  await collect(['#pph','#pdh','#board']);
+  const d=deck();P={ante:bet,d,ph:[d.pop(),d.pop()],dh:[d.pop(),d.pop()],bd:[d.pop(),d.pop(),d.pop(),d.pop(),d.pop()]};
+  say('카드 드립니다.','（カードを配ります）');
+  for(let i=0;i<2;i++){await dealCard('#pph',P.ph[i],false);await dealCard('#pdh',P.dh[i],false)}
+  await sleep(300);await flipAt('#pph',0);await flipAt('#pph',1);await sleep(400);
+  say('플랍입니다.','（フロップです）');
+  for(let i=0;i<3;i++)await dealCard('#board',P.bd[i],false,{nogap:1});
+  await sleep(300);for(let i=0;i<3;i++)await flipAt('#board',i);
+  busy=false;setBtns({pcall:1,pfold:1});say('콜 하시겠어요?','（コールしますか？）')}
+function pkEnd(){busy=false;lockBet(false);setBtns({pdeal:1,pcall:0,pfold:0});if(bet>money){bet=0;showBet()}}
+async function pkFold(){if(busy)return;busy=true;setBtns({pcall:0,pfold:0});say('폴드하셨습니다.','（フォールドされました）');
+  await collect(['#pph']);result('フォールド（アンティ没収）');pkEnd()}
+async function pkCall(){if(busy)return;busy=true;setBtns({pcall:0,pfold:0});const call=P.ante*2;setMoney(money-call);
+  say('턴.','（ターン）');await sleep(400);await dealCard('#board',P.bd[3]);
+  say('리버.','（リバー）');await sleep(500);await dealCard('#board',P.bd[4],true,{slow:1});
+  say('딜러 카드 오픈.','（ディーラーの手札を開けます）');await sleep(600);await flipAt('#pdh',0);await flipAt('#pdh',1);await sleep(300);
+  const pv=best([...P.ph,...P.bd]),dv=best([...P.dh,...P.bd]);$('#ppl').textContent='【'+HN[pv[0]]+'】';$('#pdl').textContent='【'+HN[dv[0]]+'】';
+  const qual=dv[0]>=2||(dv[0]==1&&dv[1]>=2);const antePay=P.ante*(1+ANTE_PAY[pv[0]]);let ret=0,msg;
+  if(!qual){ret=antePay+call;msg='ディーラー資格なし → アンティ配当 +₩'+fmt(antePay-P.ante);say('딜러 자격 미달입니다.','（ディーラー資格なしです）')}
+  else{const c=cmp(pv,dv);if(c>0){ret=antePay+call*2;msg='勝ち！ +₩'+fmt(ret-P.ante-call);say('축하합니다!','（おめでとうございます）')}
+   else if(c==0){ret=P.ante+call;msg='引き分け';say('비겼습니다.','（引き分けです）')}else{msg='負け… -₩'+fmt(P.ante+call);say('딜러 승입니다.','（ディーラーの勝ちです）')}}
+  setMoney(money+ret);result(msg);pkEnd()}
+
+/* ---------- Baccarat（Punto Banco） ---------- */
+const BA={on:false,sel:'P',bets:{P:0,B:0,T:0,PP:0,BP:0},road:[],shoe:null};
+const BSPOT={P:['PLAYER 플레이어','1:1'],B:['BANKER 뱅커','1:0.95'],T:['TIE 타이','8:1'],PP:['P PAIR','11:1'],BP:['B PAIR','11:1']};
+function bac(){
+  MINBET=10000;BA.bets={P:0,B:0,T:0,PP:0,BP:0};BA.sel='P';
+  tableShell('BACCARAT — 바카라 · 最低₩10,000',shoeHTML+`
+  <div class="bac">
+   <div class="side p"><div class="lbl">PLAYER <b id="bpv"></b></div><div class="cards" id="bph"></div></div>
+   <div class="side b"><div class="lbl">BANKER <b id="bbv"></b></div><div class="cards" id="bbh"></div></div>
+  </div>
+  <div class="spots" id="spots"></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="bgo" onclick="bacDeal()">ノーモアベット（配る）</button><span class="lbl">賭ける場所をタップ→チップを置く</span></div>
+  <div class="lbl" style="margin-top:12px">出目表（ビーズロード）</div><div class="road" id="road"></div>
+  <div class="tip">韓国カジノで一番人気。PLAYERかBANKERの9に近い方を当てるだけ（絵札・10＝0、A＝1、合計の一の位）。3枚目は自動ルール。BANKER勝ちは5%コミッション。TIEは8倍（P/Bの賭けは返却）。ペアは最初の2枚が同じ数字で11倍。<br>本場では賭け額の一番大きい人がカードを「絞る（スクイーズ）」のが名物。最後の1枚はゆっくりめくります。</div>`);
+  BA.on=true;bet=0;bacSpots();showBet();bacRoad();say('베팅해 주세요.','（ベットをどうぞ）');
+}
+function bacSpots(){$('#spots').innerHTML=Object.entries(BSPOT).map(([k,[n,o]])=>`<div class="spot s${k} ${BA.sel==k?'sel':''}" onclick="BA.sel='${k}';bacSpots()"><div>${n}</div><small>${o}</small><b>${BA.bets[k]?'₩'+fmt(BA.bets[k]):''}</b></div>`).join('')}
+function bacRoad(){$('#road').innerHTML=BA.road.slice(-60).map(x=>`<span class="bead ${x}">${{P:'P',B:'B',T:'T'}[x]}</span>`).join('')}
+const bv=c=>c.r<=7?c.r+2:c.r==12?1:0;const bt=h=>h.reduce((a,c)=>a+bv(c),0)%10;
+function bDraw(){return BA.shoe.cards.pop()}
+async function bacDeal(){if(busy)return;const total=Object.values(BA.bets).reduce((a,b)=>a+b,0);
+  if(!total)return say('베팅해 주세요.','（まず張ってください）');if(total<MINBET)return say('최소 베팅은 '+fmt(MINBET)+'원입니다.','（最低ベットは₩'+fmt(MINBET)+'です）');
+  busy=true;lockBet(true);$('#bgo').disabled=true;setMoney(money-total);result('');$('#bpv').textContent=$('#bbv').textContent='';
+  await collect(['#bph','#bbh']);
+  if(shoeNeed(BA.shoe)){await shuffleAnim('셔플하겠습니다.','（カットカードが出たので新しいシュー（8デッキ）に交換します）');BA.shoe=makeShoe(8,16);const f=BA.shoe.cards.pop(),n=f.r>=8&&f.r<=11?10:bv(f)||10;BA.shoe.cards.splice(-n,n);say('번 카드.',`（最初のカードは${RANKS[f.r]}なので${n}枚バーンします）`);await sleep(1400)}say('노 모어 벳.','（ノーモアベット）');await sleep(700);
+  const p=[bDraw()],b=[bDraw()];p.push(bDraw());b.push(bDraw());
+  await dealCard('#bph',p[0],false);await dealCard('#bbh',b[0],false);await dealCard('#bph',p[1],false);await dealCard('#bbh',b[1],false);
+  const squeezeP=BA.bets.P>=BA.bets.B;
+  say('플레이어 카드 오픈.','（プレイヤーのカードを開けます）');await sleep(400);
+  await flipAt('#bph',0);await flipAt('#bph',1,squeezeP);$('#bpv').textContent=bt(p);await sleep(400);
+  say('뱅커 카드 오픈.','（バンカーのカードを開けます）');await sleep(400);
+  await flipAt('#bbh',0);await flipAt('#bbh',1,!squeezeP);$('#bbv').textContent=bt(b);await sleep(500);
+  let pt=bt(p),btv=bt(b),p3=null;
+  if(pt<8&&btv<8){
+    if(pt<=5){say('플레이어 한 장 더.','（プレイヤー、もう1枚）');await sleep(500);p3=bDraw();p.push(p3);const el=await dealCard('#bph',p3,false);el.style.transform+=' rotate(90deg)';await flip(el,true);el.style.transform='rotate(90deg)';pt=bt(p);$('#bpv').textContent=pt;await sleep(400)}
+    let draw;if(p3===null)draw=btv<=5;else{const t=bv(p3);draw=btv<=2||(btv==3&&t!=8)||(btv==4&&t>=2&&t<=7)||(btv==5&&t>=4&&t<=7)||(btv==6&&t>=6&&t<=7)}
+    if(draw){say('뱅커 한 장 더.','（バンカー、もう1枚）');await sleep(500);const c=bDraw();b.push(c);const el=await dealCard('#bbh',c,false);el.style.transform+=' rotate(90deg)';await flip(el,true);el.style.transform='rotate(90deg)';btv=bt(b);$('#bbv').textContent=btv;await sleep(400)}
+  }else say('내추럴!','（ナチュラル！）');
+  const w=pt>btv?'P':btv>pt?'B':'T';let ret=0;const x=BA.bets;
+  if(w=='P')ret+=x.P*2;if(w=='B')ret+=x.B*1.95;if(w=='T')ret+=x.T*9+x.P+x.B;
+  if(p[0].r==p[1].r)ret+=x.PP*12;if(b[0].r==b[1].r)ret+=x.BP*12;ret=Math.floor(ret);
+  BA.road.push(w);bacRoad();
+  const name={P:'플레이어 승!（プレイヤーの勝ち）',B:'뱅커 승!（バンカーの勝ち）',T:'타이!（タイ）'}[w];$('#say').innerHTML=`<span class="ko">${pt} 대 ${btv}</span>${name}`;
+  const net=ret-total;result(`${{P:'PLAYER',B:'BANKER',T:'TIE'}[w]} ${pt}-${btv}　${net>=0?'+':'-'}₩${fmt(Math.abs(net))}`);
+  setMoney(money+ret);BA.bets={P:0,B:0,T:0,PP:0,BP:0};bet=0;bacSpots();showBet();busy=false;lockBet(false);$('#bgo').disabled=false}
+
+/* ---------- 大小（Sic Bo / Tai Sai） ---------- */
+const SB={on:false,sel:'small',bets:{},hist:[]};
+const TOTPAY={4:50,5:18,6:14,7:12,8:8,9:6,10:6,11:6,12:6,13:8,14:12,15:14,16:18,17:50};
+const SBS=(()=>{const L=[],tri=d=>d[0]==d[1]&&d[1]==d[2],sum=d=>d[0]+d[1]+d[2];
+  L.push({k:'small',n:'小 SMALL',s:'4〜10',o:'1:1',w:d=>!tri(d)&&sum(d)<=10?1:0});
+  L.push({k:'big',n:'大 BIG',s:'11〜17',o:'1:1',w:d=>!tri(d)&&sum(d)>=11?1:0});
+  L.push({k:'odd',n:'奇 ODD',s:'',o:'1:1',w:d=>!tri(d)&&sum(d)%2?1:0});
+  L.push({k:'even',n:'偶 EVEN',s:'',o:'1:1',w:d=>!tri(d)&&sum(d)%2==0?1:0});
+  L.push({k:'anyT',n:'ANY TRIPLE',s:'ゾロ目',o:'24:1',w:d=>tri(d)?24:0});
+  for(let i=1;i<=6;i++)L.push({k:'T'+i,n:PIP[i].repeat(3),s:'',o:'150:1',w:d=>tri(d)&&d[0]==i?150:0});
+  for(let i=1;i<=6;i++)L.push({k:'D'+i,n:PIP[i].repeat(2),s:'',o:'8:1',w:d=>d.filter(x=>x==i).length>=2?8:0});
+  for(let t=4;t<=17;t++)L.push({k:'S'+t,n:String(t),s:'',o:TOTPAY[t]+':1',w:d=>sum(d)==t?TOTPAY[t]:0});
+  for(let i=1;i<=6;i++)L.push({k:'N'+i,n:PIP[i],s:'1個1倍・2個2倍・3個3倍',o:'1〜3:1',w:d=>d.filter(x=>x==i).length});
+  return L})();
+function sicbo(){
+  MINBET=5000;tableShell('SIC BO — 다이사이（大小） · 最低₩5,000',`
+  <div class="row" style="display:flex;align-items:center;gap:18px"><div class="dome"><div class="dice" id="sbd"></div></div><div><div class="lbl">直近の出目</div><div class="road" id="sbh" style="max-width:360px"></div></div></div>
+  <div class="sbgrid" id="sbg"></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="sbgo" onclick="sbRoll()">ノーモアベット（振る）</button><span class="lbl">賭ける場所をタップ→チップを置く（複数OK）</span></div>
+  <div class="tip">韓国カジノのサイコロゲームといえばこれ。3つのサイコロの合計や組み合わせを当てます。<b>大・小・奇・偶はゾロ目が出ると負け</b>（ここがカジノの取り分）。配当は卓ごとに微妙に違う（マカオ式はトリプル180倍・合計4/17は60倍など）ので、卓の配当表を見てから張りましょう。ここでは標準的な配当表です。</div>`);
+  SB.on=true;SB.bets={};bet=0;sbRender();showBet();sbHist();say('베팅하세요.','（張ってください）');
+}
+function sbRender(){$('#sbg').innerHTML=SBS.map(s=>`<div class="sbs ${SB.sel==s.k?'sel':''} ${s.k[0]=='S'&&s.k.length<4?'tot':''} k_${s.k}" onclick="SB.sel='${s.k}';sbRender()"><div>${s.n}</div>${s.s?`<small>${s.s}</small>`:''}<small class="o">${s.o}</small>${SB.bets[s.k]?`<b>₩${fmt(SB.bets[s.k])}</b>`:''}</div>`).join('')}
+function sbHist(){$('#sbh').innerHTML=SB.hist.slice(-14).map(d=>{const s=d[0]+d[1]+d[2],t=d[0]==d[1]&&d[1]==d[2];return `<span class="bead ${t?'T':s>=11?'B':'P'}" title="${d.join('-')}">${s}</span>`}).join('')}
+async function sbRoll(){if(busy)return;const total=Object.values(SB.bets).reduce((a,b)=>a+b,0);
+  if(!total)return say('베팅하세요.','（まず張ってください）');if(total<MINBET)return say('최소 베팅은 '+fmt(MINBET)+'원입니다.','（最低ベットは₩'+fmt(MINBET)+'です）');
+  busy=true;lockBet(true);$('#sbgo').disabled=true;setMoney(money-total);result('');
+  say('노 모어 벳.','（ノーモアベット）');await sleep(900);
+  const d=r3();$('.dome').classList.add('shaking');await rollDice('#sbd',d);$('.dome').classList.remove('shaking');
+  const s=d[0]+d[1]+d[2],tri=d[0]==d[1]&&d[1]==d[2];
+  say(`${d.join(' · ')}　${s}`,tri?'（ゾロ目！大小は全部負け）':s>=11?'（大）':'（小）');
+  let ret=0;const hit=[];
+  for(const sp of SBS){const b=SB.bets[sp.k];if(!b)continue;const m=sp.w(d);if(m){ret+=b*(m+1);hit.push(sp.k)}}
+  await sleep(300);document.querySelectorAll('.sbs').forEach(e=>{const k=[...e.classList].find(c=>c.startsWith('k_')).slice(2);if(SBS.find(x=>x.k==k).w(d))e.classList.add('win')});
+  SB.hist.push(d);sbHist();setMoney(money+ret);const net=ret-total;
+  result(`${d.join('-')}（合計${s}）　${net>=0?'+':'-'}₩${fmt(Math.abs(net))}`);
+  await sleep(1800);SB.bets={};bet=0;sbRender();showBet();busy=false;lockBet(false);$('#sbgo').disabled=false}
+
+/* ---------- テキサスホールデム（客同士・ノーリミット） ---------- */
+const TH={on:false,seats:[],btn:0,SB:5000,BB:10000};
+const AIN=['민준','지훈','서연','Chen','Wang','Yuki','Kenji','Alex','Maria','Somchai','Nguyen','Park'];
+function newAI(){const used=TH.seats.map(s=>s&&s.name);const n=AIN.filter(x=>!used.includes(x));
+  return{name:n[Math.random()*n.length|0],stack:(4+(Math.random()*7|0))*100000,tight:Math.random(),aggr:Math.random(),bluff:.03+Math.random()*.09}}
+function texas(){
+  MINBET=0;tableShell("TEXAS HOLD'EM — 텍사스 홀덤（客同士・ノーリミット）",shoeHTML+`
+  <div id="thBuy" class="setup" style="margin-right:190px"><b style="color:#ffe19a">着席（バイイン）</b><br><br>
+   ₩<input id="buyin" type="number" step="50000" value="${Math.min(1000000,Math.floor(money/50000)*50000)}"> <button onclick="thSit()">この額で着席</button>
+   <div class="lbl" style="margin-top:8px">ブラインド ₩5,000 / ₩10,000（6人卓・ノーリミット）。バイイン ₩400,000〜₩1,000,000（40〜100BB）。レーキ（場代）＝フロップまで行ったポットの5%・上限₩30,000。</div></div>
+  <div class="seats" id="seats"></div>
+  <div class="row"><div class="lbl">ボード　<b id="pot" style="color:#ffe19a;font-size:15px"></b></div><div class="cards" id="tboard"></div></div>
+  <div class="ctrl" id="thA" style="display:none">
+   <button class="sec" onclick="thDo('fold')">フォールド</button><button id="thC" onclick="thDo('call')">チェック</button>
+   <span id="thRZ"><input type="range" id="thR" oninput="$('#thRV').textContent='₩'+fmt(+this.value)" style="width:160px"> <button onclick="thDo('raise')">レイズ <span id="thRV"></span></button>
+   <button class="sec" onclick="thSz(.5)">½ポット</button><button class="sec" onclick="thSz(1)">ポット</button></span><button onclick="thDo('allin')">オールイン</button></div>
+  <div class="ctrl"><button id="thN" onclick="thHand()" disabled>次のハンド</button><button class="sec" onclick="thLeave()">席を立つ（チップを持ち帰る）</button></div>
+  <div class="tip">普通のテキサスホールデム。相手は他の客（AI 5人）で、カジノは場代（レーキ）だけ取ります。ボタン（D）が毎ハンド時計回りに動き、その左がSB・BB。<br>本番メモ：レイズするときは「レイズ」と先に宣言してからチップを一度に出す（何回かに分けて出すとコール扱いになるストリングベット）。</div>`);
+  if(TH.on)thBuild();else say('어서 오세요.','（バイイン額を決めて着席してください）');
+  onLeave=()=>{if(TH.on)thLeave()};
+}
+function thSit(){const v=Math.round(+$('#buyin').value/10000)*10000;
+  if(v<400000||v>1000000)return say('바이인은 40만~100만원입니다.','（バイインは₩400,000〜₩1,000,000です）');if(v>money)return say('돈이 부족해요.','（所持金が足りません）');
+  setMoney(money-v);TH.seats=[{name:'あなた',stack:v,human:true}];for(let i=1;i<6;i++)TH.seats.push(newAI());TH.btn=Math.random()*6|0;TH.on=true;thBuild();thHand()}
+function thBuild(){$('#thBuy').style.display='none';
+  $('#seats').innerHTML=TH.seats.map((s,i)=>`<div class="seat ${s.human?'me':''}" id="seat${i}"><div class="nm"><span id="nm${i}">${s.name}</span> <span class="mk" id="mk${i}"></span></div><div class="st" id="st${i}"></div><div class="cards ${s.human?'':'mini'}" id="sc${i}"></div><div class="ac" id="sa${i}"></div></div>`).join('');
+  thRender();$('#thN').disabled=busy}
+function thLeave(){if(busy||!TH.on)return say('핸드 중입니다.','（ハンド中は席を立てません）');const s=TH.seats[0].stack;setMoney(money+s);TH.on=false;
+  $('#seats').innerHTML='';$('#tboard').innerHTML='';$('#pot').textContent='';$('#thBuy').style.display='';$('#thN').disabled=true;result('精算 ₩'+fmt(s)+' を持ち帰りました');say('감사합니다.','（ありがとうございました）')}
+const potTotal=()=>TH.seats.reduce((a,s)=>a+s.total,0);
+function thRender(){TH.seats.forEach((s,i)=>{if(!$('#st'+i))return;$('#nm'+i).textContent=s.name;$('#st'+i).textContent='₩'+fmt(s.stack);
+  const m=[];if(i==TH.btn)m.push('<b class="btn">D</b>');if(i==TH.sbI)m.push('SB');if(i==TH.bbI)m.push('BB');$('#mk'+i).innerHTML=m.join(' ');
+  $('#sa'+i).innerHTML=(s.act||'')+(s.bet?` <b>₩${fmt(s.bet)}</b>`:'');$('#seat'+i).classList.toggle('fold',!!s.folded);$('#seat'+i).classList.toggle('turn',TH.turn===i)});
+  $('#pot').textContent=TH.seats.length&&potTotal()?'ポット ₩'+fmt(potTotal()):''}
+function put(s,a){a=Math.min(a,s.stack);s.stack-=a;s.bet+=a;s.total+=a;if(!s.stack)s.allin=true}
+async function thHand(){if(busy||!TH.on)return;const S=TH.seats,n=6;
+  if(S[0].stack<TH.BB)return say('칩이 부족합니다.','（チップが足りません。席を立って再バイインしてください）');
+  busy=true;$('#thN').disabled=true;result('');
+  for(let i=1;i<n;i++)if(S[i].stack<TH.BB){const a=newAI();S[i]=a;say('새 손님이 앉았습니다.',`（${a.name} が着席しました）`)}
+  await collect(['#tboard',...S.map((_,i)=>'#sc'+i)]);
+  S.forEach(s=>Object.assign(s,{cards:[],bet:0,total:0,folded:false,allin:false,act:'',raises:0}));
+  TH.btn=(TH.btn+1)%n;TH.sbI=(TH.btn+1)%n;TH.bbI=(TH.btn+2)%n;TH.board=[];TH.turn=null;TH.flop=false;
+  const D=deck();
+  put(S[TH.sbI],TH.SB);S[TH.sbI].act='SB';put(S[TH.bbI],TH.BB);S[TH.bbI].act='BB';TH.cur=TH.BB;TH.minR=TH.BB;thRender();
+  say('카드 드립니다.','（カードを配ります）');
+  for(let r=0;r<2;r++)for(let k=1;k<=n;k++){const i=(TH.btn+k)%n,c=D.pop();S[i].cards.push(c);await dealCard('#sc'+i,c,false,{fast:1})}
+  await flipAt('#sc0',0);await flipAt('#sc0',1);
+  let go=await thRound((TH.bbI+1)%n,true);
+  const streets=[['플랍.','（フロップ）',3],['턴.','（ターン）',1],['리버.','（リバー）',1]];
+  for(const[ko,ja,k]of streets){if(!go)break;await thGather();D.pop();say(ko,ja+'　※1枚バーンしてから開きます');TH.flop=true;
+    for(let j=0;j<k;j++){const c=D.pop();TH.board.push(c);await dealCard('#tboard',c,false,{nogap:1,fast:1})}
+    for(let j=TH.board.length-k;j<TH.board.length;j++)await flipAt('#tboard',j,k==1&&TH.board.length==5);
+    go=await thRound((TH.btn+1)%n,false)}
+  await thGather();await thShowdown()}
+async function thGather(){TH.seats.forEach(s=>{s.bet=0;if(!s.folded)s.act=s.allin?'オールイン':''});TH.cur=0;TH.minR=TH.BB;thRender();await sleep(400)}
+async function thRound(start,pre){const S=TH.seats,n=6,live=()=>S.filter(s=>!s.folded);
+  if(live().length<2)return false;
+  const actors=S.filter(s=>!s.folded&&!s.allin);if(actors.length==0||(actors.length==1&&actors[0].bet>=TH.cur))return true;
+  let need=S.map(s=>!s.folded&&!s.allin),i=start;
+  while(need.some(x=>x)){
+    if(live().length<2)return false;
+    if(need[i]){const s=S[i];TH.turn=i;thRender();
+      const a=s.human?await thHuman(i):await thAI(i);need[i]=false;
+      const toCall=TH.cur-s.bet;
+      if(a.t=='fold'){s.folded=true;s.act='フォールド';[...$('#sc'+i).children].forEach(e=>{e.style.transition='opacity .4s';e.style.opacity=.15})}
+      else if(a.t=='call'){put(s,toCall);s.act=s.allin?'オールイン':toCall?'コール':'チェック'}
+      else{let to=a.t=='allin'?s.bet+s.stack:Math.min(a.to,s.bet+s.stack);
+        if(to<=TH.cur){put(s,to-s.bet);s.act=s.allin?'オールイン':'コール'}
+        else{const inc=to-TH.cur;const full=inc>=TH.minR;put(s,to-s.bet);s.act=s.allin?'オールイン':TH.cur?'レイズ':'ベット';s.raises++;
+          if(full)TH.minR=inc;TH.cur=to;S.forEach((t,j)=>{if(j!=i&&!t.folded&&!t.allin&&(full||t.bet<TH.cur))need[j]=true})}}
+      TH.turn=null;thRender();
+      const lead=pre?'':'';void lead}
+    i=(i+1)%n}
+  return live().length>=2}
+function thHuman(i){const s=TH.seats[i],toCall=TH.cur-s.bet,max=s.bet+s.stack,min=Math.min(max,TH.cur+TH.minR);
+  $('#thA').style.display='flex';$('#thC').textContent=toCall?`コール ₩${fmt(Math.min(toCall,s.stack))}`:'チェック';
+  const r=$('#thR');r.min=min;r.max=max;r.step=5000;r.value=min;$('#thRV').textContent='₩'+fmt(min);$('#thRZ').style.display=max>TH.cur?'':'none';
+  say(toCall?'콜? 레이즈?':'체크? 벳?',toCall?`（₩${fmt(toCall)} を払ってコールか、レイズかフォールド）`:'（チェックかベット）');
+  return new Promise(res=>{TH.res=res})}
+function thSz(f){const s=TH.seats[0],r=$('#thR');const v=Math.max(+r.min,Math.min(+r.max,Math.round((TH.cur+(potTotal()+TH.cur-s.bet)*f)/5000)*5000));r.value=v;$('#thRV').textContent='₩'+fmt(v)}
+function thDo(t){if(!TH.res)return;$('#thA').style.display='none';const res=TH.res;TH.res=null;res(t=='raise'?{t,to:+$('#thR').value}:{t})}
+function equity(hole,board,opp,it=160){const known=[...hole,...board],rest=deck().filter(c=>!known.some(k=>k.r==c.r&&k.s==c.s));let w=0;
+  const need=5-board.length+2*opp;
+  for(let t=0;t<it;t++){for(let j=0;j<need;j++){const k=j+(Math.random()*(rest.length-j)|0);[rest[j],rest[k]]=[rest[k],rest[j]]}
+    const b=[...board,...rest.slice(0,5-board.length)];const me=best([...hole,...b]);let r=1;
+    for(let o=0;o<opp;o++){const x=5-board.length+o*2;const c=cmp(me,best([rest[x],rest[x+1],...b]));if(c<0){r=0;break}if(c==0)r=Math.min(r,.5)}w+=r}
+  return w/it}
+async function thAI(i){const s=TH.seats[i];await sleep(700+Math.random()*1100);
+  const opp=Math.min(2,TH.seats.filter((t,j)=>j!=i&&!t.folded).length);const eq=equity(s.cards,TH.board,opp);
+  const toCall=TH.cur-s.bet,pot=potTotal(),odds=toCall/(pot+toCall),R=Math.random(),pre=!TH.board.length;
+  const rnd=v=>Math.max(TH.cur+TH.minR,Math.round(v/5000)*5000);
+  const raiseTo=pre?rnd(TH.cur*3+(Math.random()*2|0)*TH.BB):rnd(TH.cur+pot*(.5+Math.random()*.4));
+  if(toCall==0){if((eq>.62-s.aggr*.12||R<s.bluff)&&s.raises<2)return{t:'raise',to:raiseTo};return{t:'call'}}
+  if(eq<odds*(.85+s.tight*.5)&&R>s.bluff)return{t:'fold'};
+  if(eq>.68-s.aggr*.1&&s.raises<2&&R<.5+s.aggr*.4)return eq>.8&&R<.3?{t:'allin'}:{t:'raise',to:raiseTo};
+  return{t:'call'}}
+async function thShowdown(){const S=TH.seats,live=S.map((s,i)=>i).filter(i=>!S[i].folded);TH.turn=null;
+  let total=potTotal(),rake=TH.flop?Math.min(30000,Math.floor(total*.05/1000)*1000):0;
+  const sc={};
+  if(live.length>1){say('쇼다운.','（ショーダウン：手札を公開します）');for(const i of live)if(i){await flipAt('#sc'+i,0);await flipAt('#sc'+i,1)}
+    for(const i of live)sc[i]=best([...S[i].cards,...TH.board]);await sleep(500)}
+  const lv=[...new Set(live.map(i=>S[i].total))].sort((a,b)=>a-b);let prev=0;const pots=[];
+  for(const L of lv){let amt=0;S.forEach(s=>amt+=Math.max(0,Math.min(s.total,L)-prev));pots.push({amt,el:live.filter(i=>S[i].total>=L)});prev=L}
+  pots[pots.length-1].amt+=S.reduce((a,s)=>a+Math.max(0,s.total-prev),0);
+  pots[0].amt-=rake;const won=S.map(()=>0);
+  for(const p of pots){let w=p.el;if(w.length>1){let b=null;for(const i of w)if(!b||cmp(sc[i],b)>0)b=sc[i];w=w.filter(i=>cmp(sc[i],b)==0)}
+    const share=Math.floor(p.amt/w.length/1000)*1000;let rem=p.amt-share*w.length;
+    const order=[1,2,3,4,5,6].map(k=>(TH.btn+k)%6).filter(i=>w.includes(i));order.forEach((i,j)=>{won[i]+=share+(j==0?rem:0)})}
+  const msg=[];S.forEach((s,i)=>{if(won[i]){s.stack+=won[i];s.act=`<span class="winx">勝ち +₩${fmt(won[i])}${sc[i]?' '+HN[sc[i][0]]:''}</span>`;msg.push(s.name+(sc[i]?`（${HN[sc[i][0]]}）`:''))}
+    else if(!s.folded&&sc[i])s.act=HN[sc[i][0]];s.total=0;s.bet=0});
+  thRender();const me=won[0]-0;
+  say('팟은 '+msg.join(', ')+' 님께.',`（ポットは ${msg.join('・')} へ${rake?'。レーキ ₩'+fmt(rake):''}）`);
+  result(won[0]?`あなたの勝ち！ ₩${fmt(won[0])} 獲得`:'');void me;
+  busy=false;$('#thN').disabled=false}
+
+
+/* ---------- 複数スポット賭け（ルーレット・ビッグホイール共通） ---------- */
+const MS={on:false,sel:null,bets:{},render:()=>{}};
+const msTotal=()=>Object.values(MS.bets).reduce((a,b)=>a+b,0);
+function msSel(k){MS.sel=k;MS.render()}
+const chipTag=k=>MS.bets[k]?`<i class="chp">${MS.bets[k]>=10000?fmt(MS.bets[k]/10000)+'万':fmt(MS.bets[k])}</i>`:'';
+
+/* ---------- ルーレット ---------- */
+const EU=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const US=[0,28,9,26,30,11,7,20,32,17,5,22,34,15,3,24,36,13,1,'00',27,10,25,29,12,8,19,31,18,6,21,33,16,4,23,35,14,2];
+const REDS=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+const rCol=n=>n===0||n==='00'?'g':REDS.includes(n)?'r':'b';
+let RL={am:false,hist:[],rot:0,brot:0};try{RL.am=localStorage.rlam=='1'}catch(e){}
+function roulette(){
+  MINBET=5000;tableShell('ROULETTE — 룰렛 · 最低₩5,000',`
+  <div class="rules" style="margin-right:0">卓：<label><input type="radio" name="rw" ${RL.am?'':'checked'} onchange="RL.am=false;try{localStorage.rlam='0'}catch(e){};roulette()"> シングルゼロ（0のみ・37マス）</label>
+   <label><input type="radio" name="rw" ${RL.am?'checked':''} onchange="RL.am=true;try{localStorage.rlam='1'}catch(e){};roulette()"> ダブルゼロ（0と00・38マス）</label></div>
+  <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+   <div class="wheelbox"><div class="ptr">▼</div><div id="rwheel" class="rwheel">${rWheelSVG()}</div><div id="rball" class="rball"><i></i></div></div>
+   <div><div class="lbl">直近の出目</div><div class="road" id="rhist" style="max-width:300px"></div><div id="rnum" class="bignum"></div></div></div>
+  <div class="rlay" id="rlay"></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="rgo" onclick="rSpin()">ノーモアベット（スピン）</button><span class="lbl">数字や枠をタップ→チップを置く（複数OK）</span></div>
+  <div class="tip">数字1点＝36倍返し（35:1）／赤黒・奇偶・前半後半＝2倍返し／ダズン・列＝3倍返し。0（と00）が出ると外側の賭けは全部負け＝ここがカジノの取り分（シングルゼロ2.7%／ダブルゼロ5.3%）。<br>本番メモ：ディーラーが「No more bets」と手を振ったら賭け終了。当たり番号にはドリー（目印）が置かれ、それまで勝ったチップに触らないこと。</div>`);
+  MS.on=true;MS.bets={};MS.sel='red';MS.render=rLay;bet=0;rLay();showBet();rHist();RL.rot=0;RL.brot=0;say('베팅하세요.','（お賭けください）');
+}
+function rWheelSVG(){const W=RL.am?US:EU,n=W.length,seg=360/n,R=110;let g='';
+  W.forEach((x,i)=>{const a0=(i*seg-90-seg/2)*Math.PI/180,a1=((i+1)*seg-90-seg/2)*Math.PI/180;const c={g:'#1d8a3a',r:'#c0142a',b:'#111'}[rCol(x)];
+    g+=`<path d="M120,120 L${120+R*Math.cos(a0)},${120+R*Math.sin(a0)} A${R},${R} 0 0,1 ${120+R*Math.cos(a1)},${120+R*Math.sin(a1)} Z" fill="${c}" stroke="#c9a24a" stroke-width=".6"/>`;
+    g+=`<text x="120" y="${120-R+13}" transform="rotate(${i*seg} 120 120)" text-anchor="middle" font-size="9" fill="#fff" font-weight="bold">${x}</text>`});
+  return `<svg viewBox="0 0 240 240" width="240" height="240"><circle cx="120" cy="120" r="118" fill="#5a3a14"/>${g}<circle cx="120" cy="120" r="70" fill="#3a2410" stroke="#c9a24a"/><circle cx="120" cy="120" r="18" fill="#c9a24a"/></svg>`}
+const RSP=[...[...Array(36)].map((_,i)=>({k:'n'+(i+1),n:i+1,o:35,w:x=>x===i+1})),{k:'n0',o:35,w:x=>x===0},{k:'n00',o:35,w:x=>x==='00'},
+  {k:'red',o:1,w:x=>rCol(x)=='r',t:'赤'},{k:'black',o:1,w:x=>rCol(x)=='b',t:'黒'},{k:'odd',o:1,w:x=>typeof x=='number'&&x>0&&x%2==1,t:'奇数'},{k:'even',o:1,w:x=>typeof x=='number'&&x>0&&x%2==0,t:'偶数'},
+  {k:'low',o:1,w:x=>typeof x=='number'&&x>=1&&x<=18,t:'1-18'},{k:'high',o:1,w:x=>typeof x=='number'&&x>=19,t:'19-36'},
+  {k:'d1',o:2,w:x=>x>=1&&x<=12,t:'1st 12'},{k:'d2',o:2,w:x=>x>=13&&x<=24,t:'2nd 12'},{k:'d3',o:2,w:x=>x>=25&&x<=36,t:'3rd 12'},
+  {k:'c1',o:2,w:x=>typeof x=='number'&&x>0&&x%3==1,t:'2:1'},{k:'c2',o:2,w:x=>typeof x=='number'&&x>0&&x%3==2,t:'2:1'},{k:'c3',o:2,w:x=>typeof x=='number'&&x>0&&x%3==0,t:'2:1'}];
+function rLay(){const cell=(k,txt,cls,st)=>`<div class="rc ${cls} ${MS.sel==k?'sel':''} rk_${k}" style="${st}" onclick="msSel('${k}')">${txt}${chipTag(k)}</div>`;let h='';
+  h+=RL.am?cell('n0','0','g','grid-column:1;grid-row:1/3')+cell('n00','00','g','grid-column:1;grid-row:3/5'):cell('n0','0','g','grid-column:1;grid-row:1/4');
+  for(let n=1;n<=36;n++){const col=Math.ceil(n/3)+1,row=3-((n-1)%3);h+=cell('n'+n,n,rCol(n),`grid-column:${col};grid-row:${row}`)}
+  ['c3','c2','c1'].forEach((k,i)=>h+=cell(k,'2:1','o',`grid-column:14;grid-row:${i+1}`));
+  ['d1','d2','d3'].forEach((k,i)=>h+=cell(k,['1st 12','2nd 12','3rd 12'][i],'o',`grid-column:${2+i*4}/${6+i*4};grid-row:4`));
+  [['low','1-18'],['even','偶数'],['red','赤'],['black','黒'],['odd','奇数'],['high','19-36']].forEach(([k,t],i)=>h+=cell(k,t,'o'+(k=='red'?' r':k=='black'?' b':''),`grid-column:${2+i*2}/${4+i*2};grid-row:5`));
+  $('#rlay').innerHTML=h}
+function rHist(){$('#rhist').innerHTML=RL.hist.slice(-16).map(x=>`<span class="bead ${{g:'T',r:'B',b:'K'}[rCol(x)]}">${x}</span>`).join('')}
+async function rSpin(){if(busy)return;const total=msTotal();if(!total)return say('베팅하세요.','（まず張ってください）');if(total<MINBET)return say('최소 베팅은 '+fmt(MINBET)+'원입니다.','（最低ベットは₩'+fmt(MINBET)+'です）');
+  busy=true;lockBet(true);$('#rgo').disabled=true;setMoney(money-total);result('');$('#rnum').textContent='';
+  const W=RL.am?US:EU,n=W.length,seg=360/n,i=Math.random()*n|0,x=W[i];
+  say('볼 들어갑니다.','（ボールを投げます）');await sleep(600);
+  RL.rot+=360*4+((-(i*seg)-RL.rot)%360+360)%360;RL.brot-=360*7;
+  const w=$('#rwheel'),b=$('#rball');w.style.transition='transform 7s cubic-bezier(.12,.6,.2,1)';w.style.transform=`rotate(${RL.rot}deg)`;
+  b.style.transition='transform 6.4s cubic-bezier(.2,.55,.3,1)';b.style.transform=`rotate(${RL.brot}deg)`;b.classList.add('spin');
+  await sleep(3800);say('노 모어 벳.','（ノーモアベット）');await sleep(3500);b.classList.remove('spin');
+  const c=rCol(x);$('#rnum').innerHTML=`<span class="bn ${c}">${x}</span>`;
+  say(`${x} ${{g:'제로',r:'레드',b:'블랙'}[c]}`,`（${x}・${{g:'ゼロ',r:'赤',b:'黒'}[c]}）`);
+  let ret=0;for(const sp of RSP){const v=MS.bets[sp.k];if(v&&sp.w(x)){ret+=v*(sp.o+1);document.querySelector('.rk_'+sp.k)?.classList.add('win')}}
+  RL.hist.push(x);rHist();setMoney(money+ret);const net=ret-total;result(`${x}　${net>=0?'+':'-'}₩${fmt(Math.abs(net))}`);
+  await sleep(2200);MS.bets={};bet=0;rLay();showBet();busy=false;lockBet(false);$('#rgo').disabled=false}
+
+/* ---------- カリビアンスタッドポーカー ---------- */
+const CS_PAY=[1,1,2,3,4,5,7,20,50,100];
+function cstud(){
+  MINBET=10000;tableShell('CARIBBEAN STUD — 캐리비안 스터드 · 最低₩10,000',shoeHTML+`
+  <div class="row"><div class="lbl">ディーラー <span id="csd"></span></div><div class="cards" id="csdh"></div></div>
+  <div class="row"><div class="lbl">あなた <span id="csp"></span></div><div class="cards" id="csph"></div></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="csgo" onclick="csDeal()">アンティを置いて配る</button><button id="cscall" onclick="csCall()" disabled>コール（アンティ×2）</button><button id="csfold" class="sec" onclick="csFold()" disabled>フォールド</button></div>
+  <div class="tip">5枚ポーカーでディーラーと勝負。カードの交換はなし。ディーラーは1枚だけ表で配られます。<br>ディーラーは<b>A・K以上</b>で参加資格。資格なし＝アンティだけ1倍払い・コールは返却。資格あり＆勝ち＝アンティ1倍＋コールに役の配当：ワンペア1／ツーペア2／スリーカード3／ストレート4／フラッシュ5／フルハウス7／フォーカード20／SF50／ロイヤル100倍。<br>※本物には別料金のプログレッシブ（ジャックポット）サイドベットもあります（ここでは省略）。</div>`);
+  bet=0;showBet();say('앤티 베팅하세요.','（アンティをどうぞ）')}
+let CSx={};
+async function csDeal(){if(busy)return;if(!bet)return say('앤티 베팅하세요.','（アンティを置いてください）');if(!minOk())return;if(money<bet*3)return say('콜 금액이 부족해요.','（コール分も必要です：アンティ×3）');
+  busy=true;lockBet(true);setBtns({csgo:0});setMoney(money-bet);result('');$('#csd').textContent=$('#csp').textContent='';
+  await collect(['#csdh','#csph']);const d=deck();CSx={ante:bet,p:[],dh:[]};say('카드 드립니다.','（カードを配ります）');
+  for(let i=0;i<5;i++){CSx.p.push(d.pop());await dealCard('#csph',CSx.p[i],false,{fast:1});CSx.dh.push(d.pop());await dealCard('#csdh',CSx.dh[i],i==4,{fast:1})}
+  for(let i=0;i<5;i++)await flipAt('#csph',i);$('#csp').textContent='【'+HN[eval5(CSx.p)[0]]+'】';
+  busy=false;setBtns({cscall:1,csfold:1});say('콜 하시겠어요?','（コールしますか？）')}
+async function csFold(){if(busy)return;busy=true;setBtns({cscall:0,csfold:0});await collect(['#csph']);result('フォールド（アンティ没収）');say('폴드하셨습니다.','（フォールドされました）');csEnd()}
+function csEnd(){busy=false;lockBet(false);setBtns({csgo:1,cscall:0,csfold:0});if(bet>money){bet=0;showBet()}}
+async function csCall(){if(busy)return;busy=true;setBtns({cscall:0,csfold:0});const call=CSx.ante*2;setMoney(money-call);
+  say('딜러 카드 오픈.','（ディーラーの手札を開けます）');await sleep(500);for(let i=0;i<4;i++)await flipAt('#csdh',i,i==3);
+  const pv=eval5(CSx.p),dv=eval5(CSx.dh);$('#csd').textContent='【'+HN[dv[0]]+'】';
+  const rs=CSx.dh.map(c=>c.r),qual=dv[0]>=1||(rs.includes(12)&&rs.includes(11));let ret=0,msg;
+  if(!qual){ret=CSx.ante*2+call;msg='ディーラー資格なし → アンティ +₩'+fmt(CSx.ante);say('딜러 자격 미달입니다.','（ディーラー資格なし）')}
+  else{const c=cmp(pv,dv);if(c>0){const w=call*CS_PAY[pv[0]];ret=CSx.ante*2+call+w;msg=`勝ち！（${HN[pv[0]]} ${CS_PAY[pv[0]]}倍）+₩${fmt(CSx.ante+w)}`;say('축하합니다!','（おめでとうございます）')}
+    else if(c==0){ret=CSx.ante+call;msg='引き分け';say('비겼습니다.','（引き分けです）')}else{msg='負け… -₩'+fmt(CSx.ante+call);say('딜러 승입니다.','（ディーラーの勝ちです）')}}
+  setMoney(money+ret);result(msg);csEnd()}
+
+/* ---------- スリーカードポーカー ---------- */
+const H3=['ハイカード','ワンペア','フラッシュ','ストレート','スリーカード','ストレートフラッシュ'];
+function eval3(cs){const r=cs.map(c=>c.r).sort((a,b)=>b-a),fl=cs.every(c=>c.s==cs[0].s);let st=-1;
+  if(r[0]-r[1]==1&&r[1]-r[2]==1)st=r[0];else if(r.join()=='12,1,0')st=1;
+  if(st>=0&&fl)return[5,st];if(r[0]==r[2])return[4,r[0]];if(st>=0)return[3,st];if(fl)return[2,...r];
+  if(r[0]==r[1])return[1,r[0],r[2]];if(r[1]==r[2])return[1,r[1],r[0]];return[0,...r]}
+const PP_PAY=[0,1,4,6,30,40],AB_PAY=[0,0,0,1,4,5];
+let T3={pp:false};
+function tcp(){
+  MINBET=10000;tableShell('THREE CARD POKER — 쓰리카드 포커 · 最低₩10,000',shoeHTML+`
+  <div class="row"><div class="lbl">ディーラー <span id="t3d"></span></div><div class="cards" id="t3dh"></div></div>
+  <div class="row"><div class="lbl">あなた <span id="t3p"></span></div><div class="cards" id="t3ph"></div></div>
+  <div class="rules"><label><input type="checkbox" ${T3.pp?'checked':''} onchange="T3.pp=this.checked"> ペアプラスにも同額を賭ける（自分の手だけで配当）</label></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="t3go" onclick="t3Deal()">アンティを置いて配る</button><button id="t3play" onclick="t3Play()" disabled>プレイ（アンティと同額）</button><button id="t3fold" class="sec" onclick="t3Fold()" disabled>フォールド</button></div>
+  <div class="tip">3枚ずつでディーラーと勝負。3枚だとフラッシュよりストレートの方が強い（役順：SF＞スリーカード＞ストレート＞フラッシュ＞ペア）。<br>ディーラーは<b>Q以上</b>で参加資格。資格なし＝アンティ1倍・プレイ返却。資格あり＆勝ち＝アンティもプレイも1倍。<br>アンティボーナス（勝敗関係なし）：ストレート1倍／スリーカード4倍／SF5倍。ペアプラス：ペア1／フラッシュ4／ストレート6／スリーカード30／SF40倍（卓で違うことあり）。<br>基本戦略：<b>Q-6-4以上ならプレイ</b>、それ未満はフォールド。</div>`);
+  bet=0;showBet();say('앤티 베팅하세요.','（アンティをどうぞ）')}
+let T3x={};
+async function t3Deal(){if(busy)return;if(!bet)return say('앤티 베팅하세요.','（アンティを置いてください）');if(!minOk())return;const pp=T3.pp?bet:0;
+  if(money<bet*2+pp)return say('플레이 금액이 부족해요.','（プレイ分も必要です）');
+  busy=true;lockBet(true);setBtns({t3go:0});setMoney(money-bet-pp);result('');$('#t3d').textContent=$('#t3p').textContent='';
+  await collect(['#t3dh','#t3ph']);const d=deck();T3x={ante:bet,pp,p:[],dh:[]};say('카드 드립니다.','（カードを配ります）');
+  for(let i=0;i<3;i++){T3x.p.push(d.pop());await dealCard('#t3ph',T3x.p[i],false,{fast:1});T3x.dh.push(d.pop());await dealCard('#t3dh',T3x.dh[i],false,{fast:1})}
+  for(let i=0;i<3;i++)await flipAt('#t3ph',i);const pv=eval3(T3x.p);$('#t3p').textContent='【'+H3[pv[0]]+'】';
+  busy=false;setBtns({t3play:1,t3fold:1});say('플레이 하시겠어요?','（プレイしますか？）')}
+function t3PP(){const pv=eval3(T3x.p);return T3x.pp&&PP_PAY[pv[0]]?T3x.pp*(PP_PAY[pv[0]]+1):0}
+async function t3Fold(){if(busy)return;busy=true;setBtns({t3play:0,t3fold:0});const ppr=t3PP();setMoney(money+ppr);await collect(['#t3ph']);
+  result('フォールド（アンティ没収）'+(ppr?` ペアプラス +₩${fmt(ppr-T3x.pp)}`:''));say('폴드하셨습니다.','（フォールドされました）');t3End()}
+function t3End(){busy=false;lockBet(false);setBtns({t3go:1,t3play:0,t3fold:0});if(bet>money){bet=0;showBet()}}
+async function t3Play(){if(busy)return;busy=true;setBtns({t3play:0,t3fold:0});const A=T3x.ante;setMoney(money-A);
+  say('딜러 카드 오픈.','（ディーラーの手札を開けます）');await sleep(500);for(let i=0;i<3;i++)await flipAt('#t3dh',i,i==2);
+  const pv=eval3(T3x.p),dv=eval3(T3x.dh);$('#t3d').textContent='【'+H3[dv[0]]+'】';
+  const qual=dv[0]>=1||dv[1]>=10;let ret=0,msg;const bonus=A*AB_PAY[pv[0]],ppr=t3PP();
+  if(!qual){ret=A*2+A;msg='ディーラー資格なし → アンティ1倍';say('딜러 자격 미달입니다.','（ディーラー資格なし）')}
+  else{const c=cmp(pv,dv);if(c>0){ret=A*4;msg='勝ち！';say('축하합니다!','（おめでとうございます）')}else if(c==0){ret=A*2;msg='引き分け';say('비겼습니다.','（引き分けです）')}else{msg='負け';say('딜러 승입니다.','（ディーラーの勝ちです）')}}
+  ret+=bonus+ppr;const net=ret-A*2-T3x.pp;setMoney(money+ret);
+  result(msg+(bonus?' ＋アンティボーナス':'')+(ppr?' ＋ペアプラス':'')+`　${net>=0?'+':'-'}₩${fmt(Math.abs(net))}`);t3End()}
+
+/* ---------- ビッグホイール（Wheel of Fortune） ---------- */
+const BWS=[['1',24,1,'#e8e8e8'],['2',15,2,'#f2c94c'],['5',7,5,'#4a90e2'],['10',4,10,'#9b51e0'],['20',2,20,'#eb5757'],['JOKER',1,40,'#111'],['LOGO',1,40,'#c9a24a']];
+const BW=(()=>{const a=[];BWS.forEach(([k,n])=>{for(let j=0;j<n;j++)a.push({k,p:(j+.5)/n+Math.random()*1e-6})});a.sort((x,y)=>x.p-y.p);
+  const seq=[];const big=a.filter(x=>x.k=='1'),rest=a.filter(x=>x.k!='1');let bi=0,ri=0;for(let i=0;i<54;i++){if(i%9==0&&ri<rest.length||bi>=big.length)seq.push(rest[ri++].k);else if(i%2==0&&ri<rest.length)seq.push(rest[ri++].k);else seq.push(big[bi++].k)}return seq})();
+let BWr={rot:0,hist:[]};
+function bigwheel(){
+  MINBET=5000;tableShell('BIG WHEEL — 빅휠 · 最低₩5,000',`
+  <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><div class="wheelbox"><div class="ptr">▼</div><div id="bwheel" class="rwheel">${bwSVG()}</div></div>
+   <div><div class="lbl">直近の結果</div><div class="road" id="bwh" style="max-width:300px"></div><div id="bwnum" class="bignum"></div></div></div>
+  <div class="bwlay" id="bwlay"></div>
+  ${betHTML()}
+  <div class="ctrl"><button id="bwgo" onclick="bwSpin()">ノーモアベット（回す）</button></div>
+  <div class="tip">大きな輪を回して、止まったマスに賭けた人が勝ち。54マス：1（24マス・1倍）／2（15・2倍）／5（7・5倍）／10（4・10倍）／20（2・20倍）／JOKER・LOGO（各1・40倍）。<br>見た目は派手ですが、カジノの取り分はどのマスも11〜24%と全ゲームで最大級。「雰囲気を楽しむ用」と割り切るのがおすすめ。</div>`);
+  MS.on=true;MS.bets={};MS.sel='1';MS.render=bwLay;bet=0;bwLay();showBet();bwHist();BWr.rot=0;say('베팅하세요.','（お賭けください）')}
+function bwSVG(){const n=54,seg=360/n,R=110;let g='';const col=Object.fromEntries(BWS.map(x=>[x[0],x[3]]));
+  BW.forEach((k,i)=>{const a0=(i*seg-90-seg/2)*Math.PI/180,a1=((i+1)*seg-90-seg/2)*Math.PI/180;
+    g+=`<path d="M120,120 L${120+R*Math.cos(a0)},${120+R*Math.sin(a0)} A${R},${R} 0 0,1 ${120+R*Math.cos(a1)},${120+R*Math.sin(a1)} Z" fill="${col[k]}" stroke="#5a3a14" stroke-width=".8"/>`;
+    g+=`<text x="120" y="${120-R+12}" transform="rotate(${i*seg} 120 120)" text-anchor="middle" font-size="${k.length>2?5:8}" fill="${['1','2'].includes(k)?'#111':'#fff'}" font-weight="bold">${k=='LOGO'?'★':k=='JOKER'?'J':k}</text>`});
+  return `<svg viewBox="0 0 240 240" width="240" height="240"><circle cx="120" cy="120" r="118" fill="#5a3a14"/>${g}<circle cx="120" cy="120" r="40" fill="#3a0b14" stroke="#c9a24a" stroke-width="3"/><text x="120" y="125" text-anchor="middle" fill="#e8c36a" font-size="13" font-weight="bold">CASINO</text></svg>`}
+function bwLay(){$('#bwlay').innerHTML=BWS.map(([k,n,o,c])=>`<div class="bws ${MS.sel==k?'sel':''} bk_${k}" style="background:${c};color:${['1','2'].includes(k)?'#111':'#fff'}" onclick="msSel('${k}')"><div>${k=='LOGO'?'★ LOGO':k}</div><small>${o}:1</small>${chipTag(k)}</div>`).join('')}
+function bwHist(){const col=Object.fromEntries(BWS.map(x=>[x[0],x[3]]));$('#bwh').innerHTML=BWr.hist.slice(-16).map(k=>`<span class="bead" style="background:${col[k]};color:${['1','2'].includes(k)?'#111':'#fff'};width:auto;padding:0 5px;border-radius:9px">${k=='LOGO'?'★':k=='JOKER'?'J':k}</span>`).join('')}
+async function bwSpin(){if(busy)return;const total=msTotal();if(!total)return say('베팅하세요.','（まず張ってください）');if(total<MINBET)return say('최소 베팅은 '+fmt(MINBET)+'원입니다.','（最低ベットは₩'+fmt(MINBET)+'です）');
+  busy=true;lockBet(true);$('#bwgo').disabled=true;setMoney(money-total);result('');$('#bwnum').textContent='';
+  const seg=360/54,i=Math.random()*54|0,k=BW[i];say('돌립니다!','（回します！）');await sleep(500);
+  BWr.rot+=360*3+((-(i*seg)-BWr.rot)%360+360)%360+(Math.random()-.5)*seg*.6;
+  const w=$('#bwheel');w.style.transition='transform 8s cubic-bezier(.1,.55,.15,1)';w.style.transform=`rotate(${BWr.rot}deg)`;await sleep(8200);
+  $('#bwnum').textContent=k=='LOGO'?'★ LOGO':k;say(k=='JOKER'||k=='LOGO'?'잭팟!':k+'!',`（${k}）`);
+  const o=BWS.find(x=>x[0]==k)[2],v=MS.bets[k]||0,ret=v?v*(o+1):0;document.querySelector('.bk_'+k).classList.add('win');
+  BWr.hist.push(k);bwHist();setMoney(money+ret);const net=ret-total;result(`${k}　${net>=0?'+':'-'}₩${fmt(Math.abs(net))}`);
+  await sleep(2000);MS.bets={};bet=0;bwLay();showBet();busy=false;lockBet(false);$('#bwgo').disabled=false}
+
+
+lobby();
+</script></body></html>
